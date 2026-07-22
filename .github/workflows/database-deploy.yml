@@ -1,31 +1,36 @@
-name: Deploy Database
+name: Deploy SQL Database
 
 on:
-
   push:
     branches:
-      - main
+      - master
 
   workflow_dispatch:
 
 jobs:
 
-  Deploy:
+  deploy:
 
     runs-on: windows-latest
 
     steps:
 
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
+      - name: Find SQL Project
+        shell: powershell
+        run: |
+          Get-ChildItem -Recurse -Filter *.sqlproj
+
       - name: Build SQL Project
         run: |
-          msbuild DatabaseProject\Database.sqlproj /p:Configuration=Release
+          msbuild WorkProvider360\WorkProvider360.sqlproj /p:Configuration=Release
 
-      - name: Deploy Database
+      - name: Deploy
         shell: powershell
         env:
           MASTER_DB_CONNECTION: ${{ secrets.MASTER_DB_CONNECTION }}
