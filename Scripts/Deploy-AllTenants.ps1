@@ -5,7 +5,7 @@ Write-Host " SaaS Database Deployment Started"
 Write-Host "========================================"
 
 # ----------------------------------------------------
-# MASTER DATABASE CONNECTION
+# MASTER DATABASE
 # ----------------------------------------------------
 
 $MasterConnection = "Server=188.40.211.2;Database=db38045;User ID=db38045;Password=X%n3@4Wp7Pj+;Encrypt=True;TrustServerCertificate=True;"
@@ -17,20 +17,22 @@ $MasterConnection = "Server=188.40.211.2;Database=db38045;User ID=db38045;Passwo
 Write-Host ""
 Write-Host "Testing Master Database..."
 
-try {
+try
+{
     $cn = New-Object System.Data.SqlClient.SqlConnection($MasterConnection)
     $cn.Open()
     Write-Host "Connected Successfully"
     $cn.Close()
 }
-catch {
+catch
+{
     Write-Host "Connection Failed"
     Write-Host $_.Exception.Message
     exit 1
 }
 
 # ----------------------------------------------------
-# READ ALL ACTIVE AGENCIES
+# GET AGENCIES
 # ----------------------------------------------------
 
 Write-Host ""
@@ -39,14 +41,19 @@ Write-Host "Reading Agencies..."
 $Agencies = Invoke-Sqlcmd `
     -ConnectionString $MasterConnection `
     -Query @"
+
 SELECT
     AgencyId,
     AgencyName,
-    ConnectionString
+    DbServer,
+    DbName,
+    DbUser,
+    DbPassword
 FROM Agencies
 WHERE IsActive = 1
 AND IsArchived = 0
 ORDER BY AgencyId
+
 "@
 
 Write-Host "Total Agencies : $($Agencies.Count)"
@@ -57,14 +64,13 @@ Write-Host "Total Agencies : $($Agencies.Count)"
 
 $Dacpac = Get-ChildItem -Recurse -Filter *.dacpac | Select-Object -First 1
 
-if ($null -eq $Dacpac)
+if($null -eq $Dacpac)
 {
-    throw "DACPAC file not found."
+    throw "DACPAC Not Found."
 }
 
 Write-Host ""
-Write-Host "DACPAC:"
-Write-Host $Dacpac.FullName
+Write-Host "DACPAC : $($Dacpac.FullName)"
 
 # ----------------------------------------------------
 # FIND SQLPACKAGE
@@ -72,30 +78,30 @@ Write-Host $Dacpac.FullName
 
 $sqlPackage = (Get-Command sqlpackage -ErrorAction Stop).Source
 
-Write-Host ""
-Write-Host "SqlPackage:"
-Write-Host $sqlPackage
+Write-Host "SqlPackage : $sqlPackage"
 
 # ----------------------------------------------------
 # DEPLOY
 # ----------------------------------------------------
 
-foreach ($Agency in $Agencies)
+foreach($Agency in $Agencies)
 {
+
     Write-Host ""
     Write-Host "========================================"
     Write-Host "Deploying : $($Agency.AgencyName)"
     Write-Host "========================================"
 
-    $TargetConnection = $Agency.ConnectionString
+    $TargetConnection = @"
+Server=$($Agency.DbServer);
+Database=$($Agency.DbName);
+User ID=$($Agency.DbUser);
+Password=$($Agency.DbPassword);
+Encrypt=False;
+TrustServerCertificate=True;
+"@.Replace("`r","").Replace("`n","")
 
-    if ([string]::IsNullOrWhiteSpace($TargetConnection))
-    {
-        Write-Host "Connection string is empty."
-        continue
-    }
-
-    Write-Host "Publishing..."
+    Write-Host "Database : $($Agency.DbName)"
 
     & $sqlPackage `
         "/Action:Publish" `
@@ -104,19 +110,19 @@ foreach ($Agency in $Agencies)
         "/p:BlockOnPossibleDataLoss=False" `
         "/p:DropObjectsNotInSource=False"
 
-    if ($LASTEXITCODE -eq 0)
+    if($LASTEXITCODE -eq 0)
     {
         Write-Host "SUCCESS"
     }
     else
     {
         Write-Host "FAILED"
-        Write-Host "SqlPackage Exit Code : $LASTEXITCODE"
         exit $LASTEXITCODE
     }
+
 }
 
 Write-Host ""
 Write-Host "========================================"
-Write-Host " ALL DEPLOYMENTS COMPLETED"
+Write-Host " ALL DATABASES DEPLOYED SUCCESSFULLY"
 Write-Host "========================================"
