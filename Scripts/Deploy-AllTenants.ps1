@@ -1,44 +1,56 @@
-Import-Module SqlServer
+Import-Module SqlServer -ErrorAction Stop
 
-# Read Master Connection
 $MasterConnection = $env:MASTER_DB_CONNECTION
 
-# Read All Active Agencies
+Write-Host "Reading Agencies..."
+
 $Agencies = Invoke-Sqlcmd `
-    -ConnectionString $MasterConnection `
-    -Query "
+-ConnectionString $MasterConnection `
+-Query @"
 SELECT
-    AgencyId,
-    AgencyName,
-    ConnectionString
+AgencyId,
+AgencyName,
+ConnectionString
 FROM Agencies
-WHERE IsActive = 1
-AND IsArchived = 0
-"
+WHERE IsActive=1
+AND IsArchived=0
+"@
+
+$Dacpac = Get-ChildItem -Recurse -Filter *.dacpac | Select-Object -First 1
+
+if($null -eq $Dacpac)
+{
+    throw "DACPAC file not found."
+}
+
+Write-Host "DACPAC : $($Dacpac.FullName)"
 
 foreach($Agency in $Agencies)
 {
 
     Write-Host ""
-    Write-Host "================================"
-    Write-Host "Deploying : $($Agency.AgencyName)"
-    Write-Host "================================"
+    Write-Host "========================================="
+    Write-Host "Deploying $($Agency.AgencyName)"
+    Write-Host "========================================="
 
     try
     {
 
         SqlPackage.exe `
         /Action:Publish `
-        /SourceFile:"DatabaseProject\bin\Release\Database.dacpac" `
+        /SourceFile:$Dacpac.FullName `
         /TargetConnectionString:$Agency.ConnectionString
 
-        Write-Host "Deployment Successful"
+        Write-Host "SUCCESS"
 
     }
+
     catch
     {
 
-        Write-Host "Deployment Failed"
+        Write-Host "FAILED"
+
+        Write-Host $_
 
     }
 
