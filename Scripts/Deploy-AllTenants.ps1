@@ -1,42 +1,42 @@
 Import-Module SqlServer -ErrorAction Stop
 
-Write-Host "======================================="
+Write-Host "========================================"
 Write-Host " SaaS Database Deployment Started"
-Write-Host "======================================="
+Write-Host "========================================"
 
-# Read Secret
-$MasterConnection = $env:MASTER_DB_CONNECTION
+# ===========================
+# MASTER DATABASE CONNECTION
+# ===========================
 
-if ([string]::IsNullOrWhiteSpace($MasterConnection))
-{
-    throw "MASTER_DB_CONNECTION secret is empty."
-}
+$MasterConnection = "Server=188.40.211.2;Database=db38045;User ID=db38045;Password=X%n3@4Wp7Pj+;Encrypt=True;TrustServerCertificate=True;"
 
-Write-Host "Master Connection Secret Loaded"
-Write-Host "Connection String Length: $($MasterConnection.Length)"
+# ===========================
+# TEST CONNECTION
+# ===========================
 
-# Test SQL Connection
 Write-Host ""
-Write-Host "Testing Master Database Connection..."
+Write-Host "Testing Master Database..."
 
 try
 {
     $cn = New-Object System.Data.SqlClient.SqlConnection($MasterConnection)
     $cn.Open()
 
-    Write-Host "Master Database Connected Successfully"
+    Write-Host "Connected Successfully"
 
     $cn.Close()
 }
 catch
 {
     Write-Host ""
-    Write-Host "======================================="
-    Write-Host "FAILED TO CONNECT MASTER DATABASE"
-    Write-Host "======================================="
+    Write-Host "Connection Failed"
     Write-Host $_.Exception.Message
-    throw
+    exit 1
 }
+
+# ===========================
+# READ AGENCIES
+# ===========================
 
 Write-Host ""
 Write-Host "Reading Agencies..."
@@ -44,6 +44,7 @@ Write-Host "Reading Agencies..."
 $Agencies = Invoke-Sqlcmd `
 -ConnectionString $MasterConnection `
 -Query @"
+
 SELECT
 AgencyId,
 AgencyName,
@@ -51,45 +52,61 @@ ConnectionString
 FROM Agencies
 WHERE IsActive = 1
 AND IsArchived = 0
+
 "@
 
 Write-Host "Total Agencies : $($Agencies.Count)"
 
+# ===========================
+# FIND DACPAC
+# ===========================
+
 $Dacpac = Get-ChildItem -Recurse -Filter *.dacpac | Select-Object -First 1
 
-if ($null -eq $Dacpac)
+if($null -eq $Dacpac)
 {
-    throw "DACPAC file not found."
+    Write-Host "DACPAC Not Found"
+    exit 1
 }
 
 Write-Host ""
-Write-Host "DACPAC Found:"
-Write-Host $Dacpac.FullName
+Write-Host "DACPAC : $($Dacpac.FullName)"
+
+# ===========================
+# DEPLOY
+# ===========================
 
 foreach($Agency in $Agencies)
 {
+
     Write-Host ""
-    Write-Host "======================================="
+    Write-Host "-------------------------------------"
     Write-Host "Agency : $($Agency.AgencyName)"
-    Write-Host "======================================="
+    Write-Host "-------------------------------------"
 
     try
     {
-        SqlPackage.exe `
-            /Action:Publish `
-            /SourceFile:$Dacpac.FullName `
-            /TargetConnectionString:$Agency.ConnectionString
 
-        Write-Host "Deployment Successful"
+        SqlPackage.exe `
+        /Action:Publish `
+        /SourceFile:$Dacpac.FullName `
+        /TargetConnectionString:$Agency.ConnectionString
+
+        Write-Host "SUCCESS"
+
     }
     catch
     {
-        Write-Host "Deployment Failed"
+
+        Write-Host "FAILED"
+
         Write-Host $_.Exception.Message
+
     }
+
 }
 
 Write-Host ""
-Write-Host "======================================="
-Write-Host "Deployment Completed"
-Write-Host "======================================="
+Write-Host "========================================"
+Write-Host " Deployment Completed"
+Write-Host "========================================"
