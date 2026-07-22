@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>WorkProvider360</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{9fdc3175-e28c-443f-b685-dd1bc8e354f3}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql170DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>WorkProvider360</RootNamespace>
+    <AssemblyName>WorkProvider360</AssemblyName>
+    <ModelCollation>1033,CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultCollation>SQL_Latin1_General_CP1_CI_AS</DefaultCollation>
+    <DefaultFilegroup>PRIMARY</DefaultFilegroup>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="dbo\" />
+    <Folder Include="dbo\Tables\" />
+    <Folder Include="Storage\" />
+    <Folder Include="dbo\Stored Procedures\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="dbo\Tables\Roles.sql" />
+    <Build Include="dbo\Tables\Users.sql" />
+    <Build Include="dbo\Tables\RefreshTokens.sql" />
+    <Build Include="dbo\Tables\PasswordResetTokens.sql" />
+    <Build Include="dbo\Tables\ApplicationSettings.sql" />
+    <Build Include="dbo\Tables\ApplicationQuestions.sql" />
+    <Build Include="dbo\Tables\RoleApplications.sql" />
+    <Build Include="dbo\Tables\ApplicationAnswers.sql" />
+    <Build Include="dbo\Tables\SchedulingSettings.sql" />
+    <Build Include="dbo\Tables\Schedules.sql" />
+    <Build Include="dbo\Tables\ScheduleNotes.sql" />
+    <Build Include="dbo\Tables\TimeEntries.sql" />
+    <Build Include="dbo\Tables\LocationPings.sql" />
+    <Build Include="dbo\Tables\Timezone.sql" />
+    <Build Include="Storage\db58257.sql" />
+    <Build Include="dbo\Stored Procedures\usp_User_GetAll.sql" />
+    <Build Include="dbo\Stored Procedures\usp_GetTimezonesForDropdown.sql" />
+    <Build Include="dbo\Stored Procedures\usp_User_EmailExists.sql" />
+    <Build Include="dbo\Stored Procedures\usp_User_Create.sql" />
+    <Build Include="dbo\Stored Procedures\usp_User_UpdatePassword.sql" />
+    <Build Include="dbo\Stored Procedures\usp_PasswordResetToken_Create.sql" />
+    <Build Include="dbo\Stored Procedures\usp_PasswordResetToken_GetActive.sql" />
+    <Build Include="dbo\Stored Procedures\usp_PasswordResetToken_MarkUsed.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Agency_GetByDomain.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Agency_GetById.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Role_NameExists.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Role_Create.sql" />
+    <Build Include="dbo\Stored Procedures\usp_RefreshToken_Create.sql" />
+    <Build Include="dbo\Stored Procedures\usp_RefreshToken_GetActive.sql" />
+    <Build Include="dbo\Stored Procedures\usp_RefreshToken_Revoke.sql" />
+    <Build Include="dbo\Stored Procedures\usp_RefreshToken_RevokeAllForUser.sql" />
+    <Build Include="dbo\Stored Procedures\usp_ApplicationSettings_Get.sql" />
+    <Build Include="dbo\Stored Procedures\usp_ApplicationSettings_Upsert.sql" />
+    <Build Include="dbo\Stored Procedures\usp_ApplicationQuestion_GetActive.sql" />
+    <Build Include="dbo\Stored Procedures\usp_ApplicationQuestion_GetAll.sql" />
+    <Build Include="dbo\Stored Procedures\usp_ApplicationQuestion_GetById.sql" />
+    <Build Include="dbo\Stored Procedures\usp_ApplicationQuestion_Create.sql" />
+    <Build Include="dbo\Stored Procedures\usp_ApplicationQuestion_Update.sql" />
+    <Build Include="dbo\Stored Procedures\usp_ApplicationQuestion_Deactivate.sql" />
+    <Build Include="dbo\Stored Procedures\usp_RoleApplication_Create.sql" />
+    <Build Include="dbo\Stored Procedures\usp_RoleApplication_GetAll.sql" />
+    <Build Include="dbo\Stored Procedures\usp_RoleApplication_GetById.sql" />
+    <Build Include="dbo\Stored Procedures\usp_RoleApplication_UpdateStatus.sql" />
+    <Build Include="dbo\Stored Procedures\usp_ApplicationAnswer_Create.sql" />
+    <Build Include="dbo\Stored Procedures\usp_ApplicationAnswer_GetByApplication.sql" />
+    <Build Include="dbo\Stored Procedures\usp_SchedulingSettings_Get.sql" />
+    <Build Include="dbo\Stored Procedures\usp_SchedulingSettings_UpdateAccess.sql" />
+    <Build Include="dbo\Stored Procedures\usp_SchedulingSettings_UpdateDefaults.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Schedule_Create.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Schedule_GetAll.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Schedule_GetById.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Schedule_Update.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Schedule_UpdateStatus.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Schedule_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\usp_ScheduleNote_Create.sql" />
+    <Build Include="dbo\Stored Procedures\usp_ScheduleNote_GetBySchedule.sql" />
+    <Build Include="dbo\Stored Procedures\usp_TimeEntry_ClockIn.sql" />
+    <Build Include="dbo\Stored Procedures\usp_TimeEntry_ClockOut.sql" />
+    <Build Include="dbo\Stored Procedures\usp_TimeEntry_GetOpen.sql" />
+    <Build Include="dbo\Stored Procedures\usp_TimeEntry_Create.sql" />
+    <Build Include="dbo\Stored Procedures\usp_TimeEntry_Update.sql" />
+    <Build Include="dbo\Stored Procedures\usp_TimeEntry_GetBySchedule.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Schedule_GetReport.sql" />
+    <Build Include="dbo\Stored Procedures\usp_LocationPing_Create.sql" />
+    <Build Include="dbo\Stored Procedures\usp_LocationPing_GetTrail.sql" />
+    <Build Include="dbo\Stored Procedures\usp_LocationPing_GetLiveLatest.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Role_GetAll.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Role_GetById.sql" />
+    <Build Include="dbo\Stored Procedures\usp_User_GetByEmail.sql" />
+    <Build Include="dbo\Stored Procedures\usp_User_GetById.sql" />
+    <Build Include="dbo\Stored Procedures\usp_GetTimezones.sql" />
+  </ItemGroup>
+</Project>

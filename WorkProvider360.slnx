@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="WorkProvider360/WorkProvider360.sqlproj">
+    <Build />
+    <Deploy />
+  </Project>
+</Solution>
