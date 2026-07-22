@@ -1,4 +1,4 @@
-﻿
+﻿--make by jasmeet singh
 CREATE   PROCEDURE dbo.usp_RefreshToken_RevokeAllForUser
     @UserId INT
 AS
