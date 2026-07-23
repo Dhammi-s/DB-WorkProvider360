@@ -5,6 +5,7 @@
     [Phone]            NVARCHAR (50)   NULL,
     [Address]          NVARCHAR (500)  NULL,
     [RequestedRoleId]  INT             NOT NULL,
+    [DesiredSalary]    DECIMAL (10, 2) NULL,
     [Status]           NVARCHAR (20)   CONSTRAINT [DF_RoleApplications_Status] DEFAULT (N'Pending') NOT NULL,
     [RejectionReason]  NVARCHAR (1000) NULL,
     [ReviewedByUserId] INT             NULL,

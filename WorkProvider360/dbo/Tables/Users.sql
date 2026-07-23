@@ -6,6 +6,7 @@
     [PasswordSalt] NVARCHAR (100) NOT NULL,
     [RoleId]       INT            NOT NULL,
     [OfficeId]     UNIQUEIDENTIFIER NULL,
+    [Salary]       DECIMAL (10, 2) NULL,
     [IsActive]     BIT            CONSTRAINT [DF_Users_IsActive] DEFAULT ((1)) NOT NULL,
     [CreatedOn]    DATETIME2 (7)  CONSTRAINT [DF_Users_CreatedOn] DEFAULT (sysutcdatetime()) NOT NULL,
     [UpdatedOn]    DATETIME2 (7)  NULL,

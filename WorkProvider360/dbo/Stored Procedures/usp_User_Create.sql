@@ -6,13 +6,14 @@ CREATE   PROCEDURE dbo.usp_User_Create
     @PasswordSalt NVARCHAR(100),
     @RoleId       INT,
     @IsActive     BIT,
-    @OfficeId     UNIQUEIDENTIFIER = NULL
+    @OfficeId     UNIQUEIDENTIFIER = NULL,
+    @Salary       DECIMAL(10,2)    = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    INSERT INTO dbo.Users (Email, FullName, PasswordHash, PasswordSalt, RoleId, IsActive, OfficeId)
-    VALUES (@Email, @FullName, @PasswordHash, @PasswordSalt, @RoleId, @IsActive, @OfficeId);
+    INSERT INTO dbo.Users (Email, FullName, PasswordHash, PasswordSalt, RoleId, IsActive, OfficeId, Salary)
+    VALUES (@Email, @FullName, @PasswordHash, @PasswordSalt, @RoleId, @IsActive, @OfficeId, @Salary);
 
     SELECT CAST(SCOPE_IDENTITY() AS INT);   -- new UserId
 END
