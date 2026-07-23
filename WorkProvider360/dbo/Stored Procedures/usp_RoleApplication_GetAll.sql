@@ -6,7 +6,7 @@ BEGIN
     SET NOCOUNT ON;
     SELECT
         a.ApplicationId, a.FullName, a.Email, a.Phone, a.Address,
-        a.RequestedRoleId, r.RoleName AS RequestedRoleName,
+        a.RequestedRoleId, r.RoleName AS RequestedRoleName, a.DesiredSalary,
         a.Status, a.RejectionReason, a.ReviewedByUserId, a.ReviewedOn, a.CreatedOn
     FROM dbo.RoleApplications a
     INNER JOIN dbo.Roles r ON r.RoleId = a.RequestedRoleId
