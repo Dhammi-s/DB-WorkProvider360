@@ -6,7 +6,7 @@ BEGIN
 
     SELECT
         TimezoneId,
-        Timezone,
+        Timezone AS TimezoneName,
         Description,
         IsActive
     FROM dbo.Timezone
