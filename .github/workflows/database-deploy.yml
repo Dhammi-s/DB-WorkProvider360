@@ -1,0 +1,45 @@
+name: Deploy SQL Database
+
+on:
+  push:
+    branches:
+      - master
+
+  workflow_dispatch:
+
+jobs:
+
+  deploy:
+
+    runs-on: windows-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - uses: microsoft/setup-msbuild@v2
+
+      - name: Build SQL Project
+        shell: powershell
+        run: |
+          msbuild WorkProvider360\WorkProvider360.sqlproj /p:Configuration=Release
+
+      - name: Install SqlPackage
+        shell: powershell
+        run: |
+          dotnet tool install --global microsoft.sqlpackage
+
+      - name: Add SqlPackage To PATH
+        shell: powershell
+        run: |
+          "$env:USERPROFILE\.dotnet\tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Verify SqlPackage
+        shell: powershell
+        run: |
+          sqlpackage /Version
+
+      - name: Deploy
+        shell: powershell
+        run: |
+          .\Scripts\Deploy-AllTenants.ps1

@@ -4,6 +4,7 @@
    so it matches regardless of how the URL was saved. */
 CREATE   PROCEDURE dbo.usp_Agency_GetByDomain
     @DomainUrl NVARCHAR(256)
+   --jassa
 AS
 BEGIN
     SET NOCOUNT ON;

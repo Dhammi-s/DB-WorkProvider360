@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="WorkProvider360/WorkProvider360.sqlproj">
+  <Project Path="WorkProvider360/WorkProvider360.sqlproj" Id="9fdc3175-e28c-443f-b685-dd1bc8e354f3">
     <Build />
     <Deploy />
   </Project>
