@@ -82,6 +82,8 @@
     <Build Include="dbo\Tables\EmailLog.sql" />
     <Build Include="dbo\Tables\LogSettings.sql" />
     <Build Include="dbo\Tables\Branding.sql" />
+    <Build Include="dbo\Tables\Announcement.sql" />
+    <Build Include="dbo\Tables\AnnouncementSettings.sql" />
     <Build Include="Storage\db58257.sql" />
     <Build Include="dbo\Stored Procedures\usp_User_GetAll.sql" />
     <Build Include="dbo\Stored Procedures\usp_GetTimezonesForDropdown.sql" />
@@ -152,6 +154,12 @@
     <Build Include="dbo\Stored Procedures\usp_LogSettings_Upsert.sql" />
     <Build Include="dbo\Stored Procedures\usp_Branding_Get.sql" />
     <Build Include="dbo\Stored Procedures\usp_Branding_UpsertLogo.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Announcement_Create.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Announcement_GetActive.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Announcement_GetAll.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Announcement_Deactivate.sql" />
+    <Build Include="dbo\Stored Procedures\usp_AnnouncementSettings_Get.sql" />
+    <Build Include="dbo\Stored Procedures\usp_AnnouncementSettings_Upsert.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />
