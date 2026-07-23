@@ -78,6 +78,7 @@
     <Build Include="dbo\Tables\TimeEntries.sql" />
     <Build Include="dbo\Tables\LocationPings.sql" />
     <Build Include="dbo\Tables\Timezone.sql" />
+    <Build Include="dbo\Tables\Office.sql" />
     <Build Include="Storage\db58257.sql" />
     <Build Include="dbo\Stored Procedures\usp_User_GetAll.sql" />
     <Build Include="dbo\Stored Procedures\usp_GetTimezonesForDropdown.sql" />
@@ -135,5 +136,15 @@
     <Build Include="dbo\Stored Procedures\usp_User_GetByEmail.sql" />
     <Build Include="dbo\Stored Procedures\usp_User_GetById.sql" />
     <Build Include="dbo\Stored Procedures\usp_GetTimezones.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Timezone_GetActive.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Office_Create.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Office_Update.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Office_GetAll.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Office_GetById.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Office_Deactivate.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Office_GetMembers.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Script.PostDeployment.sql" />
   </ItemGroup>
 </Project>
