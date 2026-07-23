@@ -81,6 +81,7 @@
     <Build Include="dbo\Tables\Office.sql" />
     <Build Include="dbo\Tables\EmailLog.sql" />
     <Build Include="dbo\Tables\LogSettings.sql" />
+    <Build Include="dbo\Tables\Branding.sql" />
     <Build Include="Storage\db58257.sql" />
     <Build Include="dbo\Stored Procedures\usp_User_GetAll.sql" />
     <Build Include="dbo\Stored Procedures\usp_GetTimezonesForDropdown.sql" />
@@ -149,6 +150,8 @@
     <Build Include="dbo\Stored Procedures\usp_EmailLog_GetRecent.sql" />
     <Build Include="dbo\Stored Procedures\usp_LogSettings_Get.sql" />
     <Build Include="dbo\Stored Procedures\usp_LogSettings_Upsert.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Branding_Get.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Branding_UpsertLogo.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />
