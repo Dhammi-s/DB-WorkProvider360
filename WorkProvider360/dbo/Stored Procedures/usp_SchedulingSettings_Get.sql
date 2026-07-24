@@ -7,7 +7,8 @@ AS
 BEGIN
     SET NOCOUNT ON;
     SELECT SettingsId, AdminAccess, ManagerAccess, DefaultPayRatePerHour,
-           DefaultOvertimeMultiplier, NotifyAdminOnCreate, NotifyManagerOnCreate, UpdatedOn
+           DefaultOvertimeMultiplier, NotifyAdminOnCreate, NotifyManagerOnCreate,
+           AutoClockEnabled, UpdatedOn
     FROM dbo.SchedulingSettings
     WHERE SettingsId = 1;
 END

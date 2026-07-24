@@ -136,6 +136,7 @@
     <Build Include="dbo\Stored Procedures\usp_TimeEntry_Update.sql" />
     <Build Include="dbo\Stored Procedures\usp_TimeEntry_GetBySchedule.sql" />
     <Build Include="dbo\Stored Procedures\usp_Schedule_GetReport.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Schedule_ApplyAutoClock.sql" />
     <Build Include="dbo\Stored Procedures\usp_LocationPing_Create.sql" />
     <Build Include="dbo\Stored Procedures\usp_LocationPing_GetTrail.sql" />
     <Build Include="dbo\Stored Procedures\usp_LocationPing_GetLiveLatest.sql" />

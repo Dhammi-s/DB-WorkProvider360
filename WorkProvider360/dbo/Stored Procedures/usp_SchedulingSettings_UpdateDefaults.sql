@@ -3,7 +3,8 @@ CREATE   PROCEDURE dbo.usp_SchedulingSettings_UpdateDefaults
     @DefaultPayRatePerHour     DECIMAL(10,2),
     @DefaultOvertimeMultiplier DECIMAL(5,2),
     @NotifyAdminOnCreate       BIT,
-    @NotifyManagerOnCreate     BIT
+    @NotifyManagerOnCreate     BIT,
+    @AutoClockEnabled          BIT
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -16,6 +17,7 @@ BEGIN
         DefaultOvertimeMultiplier = @DefaultOvertimeMultiplier,
         NotifyAdminOnCreate = @NotifyAdminOnCreate,
         NotifyManagerOnCreate = @NotifyManagerOnCreate,
+        AutoClockEnabled = @AutoClockEnabled,
         UpdatedOn = SYSUTCDATETIME()
     WHERE SettingsId = 1;
 
