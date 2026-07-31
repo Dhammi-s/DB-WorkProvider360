@@ -1,4 +1,12 @@
-﻿
+/* =============================================================================
+   WorkProvider360 - Multi-tenant SaaS platform
+   Developed by : Jasmeet Singh  (Full Stack Software Engineer)
+   Date         : 2026-07-31
+   NOTE TO DEVELOPERS: Do NOT change functionality without full knowledge of the
+   SaaS architecture. PLEASE FIRST DISCUSS WITH SOFTWARE ENGINEER JASMEET SINGH.
+   ============================================================================= */
+
+
 /* --------------------------------- Report -------------------------------- */
 /* One row per schedule in range, with total COMPLETED worked seconds. The BLL
    layer computes regular vs overtime hours and earnings from these rows. */

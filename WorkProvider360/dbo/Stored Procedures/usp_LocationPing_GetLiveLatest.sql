@@ -1,4 +1,12 @@
-﻿
+/* =============================================================================
+   WorkProvider360 - Multi-tenant SaaS platform
+   Developed by : Jasmeet Singh  (Full Stack Software Engineer)
+   Date         : 2026-07-31
+   NOTE TO DEVELOPERS: Do NOT change functionality without full knowledge of the
+   SaaS architecture. PLEASE FIRST DISCUSS WITH SOFTWARE ENGINEER JASMEET SINGH.
+   ============================================================================= */
+
+
 /* Latest position for every schedule that is currently "live" (the assigned
    user has an open time entry). Optionally scoped to a single user. */
 CREATE   PROCEDURE dbo.usp_LocationPing_GetLiveLatest
