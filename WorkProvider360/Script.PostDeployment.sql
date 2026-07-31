@@ -100,3 +100,44 @@ BEGIN
          N'Jordan Rivera',
          N'COO, ClearPath HVAC — Toronto, ON');
 END
+
+
+/* ---------------------------------------------------------------------------
+   Seed the fixed role list. Idempotent: only inserts roles that are missing.
+   RoleId is a plain INT (not identity), so explicit ids are allowed.
+   --------------------------------------------------------------------------- */
+INSERT INTO dbo.Roles (RoleId, RoleName, IsActive)
+SELECT v.RoleId, v.RoleName, 1
+FROM (VALUES
+    (1, N'SuperAdmin'),
+    (2, N'Admin'),
+    (3, N'Manager'),
+    (4, N'User')
+) AS v (RoleId, RoleName)
+WHERE NOT EXISTS (SELECT 1 FROM dbo.Roles r WHERE r.RoleId = v.RoleId);
+
+
+/* ---------------------------------------------------------------------------
+   Seed the initial SuperAdmin so a freshly provisioned tenant can be signed
+   into. Idempotent: only inserts when this email is not already present.
+   NOTE: this is a shared bootstrap credential baked into the deploy — change
+   the password after first login for each tenant.
+   --------------------------------------------------------------------------- */
+IF NOT EXISTS (SELECT 1 FROM dbo.Users WHERE Email = N'jassadhammi@gmail.com')
+BEGIN
+    INSERT INTO dbo.Users
+        (Email, FullName, PasswordHash, PasswordSalt, RoleId, Phone, AvatarUrl, OfficeId, Salary, IsActive)
+    VALUES
+    (
+        N'jassadhammi@gmail.com',
+        N'jasmeet singh',
+        N'2gK9tsjzMVOuR+ePC71DXRi9lFVJFLwPo+gZYZiqSdOBRIp66YdC/qbA0qd0cl6FbzAC40sRvSjvzf2Q1MxatA==',
+        N'3ONlQRaEW+Bup4SS8k0krnW/hrlleLlGID4hHNg4QKo=',
+        1,
+        N'8198088924',
+        N'https://res.cloudinary.com/lfdxdxyj/image/upload/v1785489946/workprovider360/avatars/pe78vjsjafbvkdljujwl.png',
+        NULL,
+        NULL,
+        1
+    );
+END
