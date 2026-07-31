@@ -1,3 +1,7 @@
+param(
+    [switch]$GenerateScript
+)
+
 Import-Module SqlServer -ErrorAction Stop
 
 Write-Host "========================================"
@@ -81,15 +85,25 @@ $sqlPackage = (Get-Command sqlpackage -ErrorAction Stop).Source
 Write-Host "SqlPackage : $sqlPackage"
 
 # ----------------------------------------------------
-# DEPLOY
+# CREATE OUTPUT FOLDER
+# ----------------------------------------------------
+
+$OutputFolder = Join-Path $PSScriptRoot "Output"
+
+if(!(Test-Path $OutputFolder))
+{
+    New-Item -ItemType Directory -Path $OutputFolder | Out-Null
+}
+
+# ----------------------------------------------------
+# PROCESS TENANTS
 # ----------------------------------------------------
 
 foreach($Agency in $Agencies)
 {
-
     Write-Host ""
     Write-Host "========================================"
-    Write-Host "Deploying : $($Agency.AgencyName)"
+    Write-Host "Processing : $($Agency.AgencyName)"
     Write-Host "========================================"
 
     $TargetConnection = @"
@@ -101,28 +115,61 @@ Encrypt=False;
 TrustServerCertificate=True;
 "@.Replace("`r","").Replace("`n","")
 
-    Write-Host "Database : $($Agency.DbName)"
+    if($GenerateScript)
+    {
+        $ScriptFile = Join-Path $OutputFolder "$($Agency.DbName).sql"
 
-    & $sqlPackage `
-        "/Action:Publish" `
-        "/SourceFile:$($Dacpac.FullName)" `
-        "/TargetConnectionString:$TargetConnection" `
-        "/p:BlockOnPossibleDataLoss=False" `
-        "/p:DropObjectsNotInSource=False"
+        Write-Host "Generating Script : $ScriptFile"
+
+        & $sqlPackage `
+            "/Action:Script" `
+            "/SourceFile:$($Dacpac.FullName)" `
+            "/TargetConnectionString:$TargetConnection" `
+            "/OutputPath:$ScriptFile" `
+            "/p:BlockOnPossibleDataLoss=False" `
+            "/p:DropObjectsNotInSource=False"
+    }
+    else
+    {
+        Write-Host "Deploying : $($Agency.DbName)"
+
+        & $sqlPackage `
+            "/Action:Publish" `
+            "/SourceFile:$($Dacpac.FullName)" `
+            "/TargetConnectionString:$TargetConnection" `
+            "/p:BlockOnPossibleDataLoss=False" `
+            "/p:DropObjectsNotInSource=False"
+    }
 
     if($LASTEXITCODE -eq 0)
     {
-        Write-Host "SUCCESS"
+        if($GenerateScript)
+        {
+            Write-Host "Script Generated Successfully"
+        }
+        else
+        {
+            Write-Host "Deployment Successful"
+        }
     }
     else
     {
         Write-Host "FAILED"
         exit $LASTEXITCODE
     }
-
 }
 
 Write-Host ""
 Write-Host "========================================"
-Write-Host " ALL DATABASES DEPLOYED SUCCESSFULLY"
+
+if($GenerateScript)
+{
+    Write-Host " ALL SQL SCRIPTS GENERATED SUCCESSFULLY"
+    Write-Host " Output Folder : $OutputFolder"
+}
+else
+{
+    Write-Host " ALL DATABASES DEPLOYED SUCCESSFULLY"
+}
+
 Write-Host "========================================"
