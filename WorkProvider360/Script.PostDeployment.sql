@@ -69,3 +69,26 @@ FROM src s
 WHERE NOT EXISTS (
     SELECT 1 FROM dbo.Timezone t WHERE t.[Timezone] = s.[Timezone]
 );
+
+
+/* ---------------------------------------------------------------------------
+   Seed the default login-page content (single row, SettingsId = 1). Idempotent:
+   only inserts when the row is missing, so SuperAdmin edits are never overwritten.
+   --------------------------------------------------------------------------- */
+IF NOT EXISTS (SELECT 1 FROM dbo.LoginPageContent WHERE SettingsId = 1)
+BEGIN
+    INSERT INTO dbo.LoginPageContent
+        (SettingsId, HeadlineLead, HeadlineHighlight, HeadlineTrail, Subtitle,
+         Stat1Label, Stat1Value, Stat2Label, Stat2Value, Stat3Label, Stat3Value,
+         QuoteText, QuoteAuthor, QuoteRole)
+    VALUES
+        (1,
+         N'Field service', N'reimagined', N'with AI',
+         N'Intelligent scheduling, real-time dispatch, and AI-powered insights for modern service businesses.',
+         N'Jobs Dispatched', N'1.2M+',
+         N'Active Teams',    N'2,400+',
+         N'Uptime SLA',      N'99.97%',
+         N'WorkProvider360 cut our scheduling time by 70% and increased our first-time fix rate to 94%. It''s transformed how we operate.',
+         N'Jordan Rivera',
+         N'COO, ClearPath HVAC — Toronto, ON');
+END
