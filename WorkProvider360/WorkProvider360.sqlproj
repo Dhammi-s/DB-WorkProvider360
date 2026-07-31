@@ -91,6 +91,7 @@
     <Build Include="Storage\db58257.sql" />
     <Build Include="dbo\Stored Procedures\usp_User_GetAll.sql" />
     <Build Include="dbo\Stored Procedures\usp_User_GetPaged.sql" />
+    <Build Include="dbo\Stored Procedures\usp_User_UpdateAvatar.sql" />
     <Build Include="dbo\Stored Procedures\usp_GetTimezonesForDropdown.sql" />
     <Build Include="dbo\Stored Procedures\usp_User_EmailExists.sql" />
     <Build Include="dbo\Stored Procedures\usp_User_Create.sql" />
