@@ -90,6 +90,7 @@
     <Build Include="dbo\Tables\PosFeeSettings.sql" />
     <Build Include="Storage\db58257.sql" />
     <Build Include="dbo\Stored Procedures\usp_User_GetAll.sql" />
+    <Build Include="dbo\Stored Procedures\usp_User_GetPaged.sql" />
     <Build Include="dbo\Stored Procedures\usp_GetTimezonesForDropdown.sql" />
     <Build Include="dbo\Stored Procedures\usp_User_EmailExists.sql" />
     <Build Include="dbo\Stored Procedures\usp_User_Create.sql" />
@@ -115,6 +116,7 @@
     <Build Include="dbo\Stored Procedures\usp_ApplicationQuestion_Deactivate.sql" />
     <Build Include="dbo\Stored Procedures\usp_RoleApplication_Create.sql" />
     <Build Include="dbo\Stored Procedures\usp_RoleApplication_GetAll.sql" />
+    <Build Include="dbo\Stored Procedures\usp_RoleApplication_GetPaged.sql" />
     <Build Include="dbo\Stored Procedures\usp_RoleApplication_GetById.sql" />
     <Build Include="dbo\Stored Procedures\usp_RoleApplication_UpdateStatus.sql" />
     <Build Include="dbo\Stored Procedures\usp_ApplicationAnswer_Create.sql" />
@@ -155,6 +157,7 @@
     <Build Include="dbo\Stored Procedures\usp_Office_GetMembers.sql" />
     <Build Include="dbo\Stored Procedures\usp_EmailLog_Create.sql" />
     <Build Include="dbo\Stored Procedures\usp_EmailLog_GetRecent.sql" />
+    <Build Include="dbo\Stored Procedures\usp_EmailLog_GetPaged.sql" />
     <Build Include="dbo\Stored Procedures\usp_SecurityEvent_Create.sql" />
     <Build Include="dbo\Stored Procedures\usp_SecurityEvent_GetRecent.sql" />
     <Build Include="dbo\Stored Procedures\usp_SecurityEvent_GetTypeCounts.sql" />
