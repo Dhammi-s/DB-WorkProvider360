@@ -12,11 +12,9 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
+      - uses: microsoft/setup-msbuild@v2
 
       - name: Build SQL Project
         shell: powershell
@@ -49,67 +47,7 @@ jobs:
           name: SQL-Deployment-Scripts
           path: Scripts\Output\*.sql
 
-      - name: Deploy SQL Database
+      - name: Deploy
         shell: powershell
         run: |
           .\Scripts\Deploy-AllTenants.ps1
-
-      # SUCCESS EMAIL
-      - name: Send Success Email
-        if: success()
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp-relay.brevo.com
-          server_port: 587
-          secure: false
-          username: a06f74001@smtp-brevo.com
-          password: <YOUR_BREVO_PASSWORD>
-
-          subject: "✅ SQL Deployment Successful"
-
-          to: jassadhammi@gmail.com
-          from: jassadhammi@gmail.com
-
-          body: |
-            Hello,
-
-            SQL Deployment completed successfully.
-
-            Repository : ${{ github.repository }}
-            Branch     : ${{ github.ref_name }}
-            Commit     : ${{ github.sha }}
-            Workflow   : ${{ github.workflow }}
-            Triggered By : ${{ github.actor }}
-
-            View Workflow:
-            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-      # FAILURE EMAIL
-      - name: Send Failure Email
-        if: failure()
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp-relay.brevo.com
-          server_port: 587
-          secure: false
-          username: a06f74001@smtp-brevo.com
-          password: xsmtpsib-b7c4d44bcfa0fbf170d25021031ae922c3a5d810c1a18be709ee6740721683cb-JCPJmvANS1nkOMfF
-
-          subject: "❌ SQL Deployment Failed"
-
-          to: jassadhammi@gmail.com
-          from: jassadhammi@gmail.com
-
-          body: |
-            Hello,
-
-            SQL Deployment FAILED.
-
-            Repository : ${{ github.repository }}
-            Branch     : ${{ github.ref_name }}
-            Commit     : ${{ github.sha }}
-            Workflow   : ${{ github.workflow }}
-            Triggered By : ${{ github.actor }}
-
-            View Error Logs:
-            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
