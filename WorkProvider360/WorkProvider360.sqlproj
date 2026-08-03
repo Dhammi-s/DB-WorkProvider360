@@ -83,6 +83,7 @@
     <Build Include="dbo\Tables\SecurityEvents.sql" />
     <Build Include="dbo\Tables\LoginPageContent.sql" />
     <Build Include="dbo\Tables\ChatMessages.sql" />
+    <Build Include="dbo\Tables\Notifications.sql" />
     <Build Include="dbo\Tables\LogSettings.sql" />
     <Build Include="dbo\Tables\Branding.sql" />
     <Build Include="dbo\Tables\Announcement.sql" />
@@ -166,6 +167,10 @@
     <Build Include="dbo\Stored Procedures\usp_ChatMessage_Create.sql" />
     <Build Include="dbo\Stored Procedures\usp_ChatMessage_GetByUser.sql" />
     <Build Include="dbo\Stored Procedures\usp_ChatMessage_ClearByUser.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Notification_Create.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Notification_GetByUser.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Notification_UnreadCount.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Notification_MarkAllRead.sql" />
     <Build Include="dbo\Stored Procedures\usp_SecurityEvent_Create.sql" />
     <Build Include="dbo\Stored Procedures\usp_SecurityEvent_GetRecent.sql" />
     <Build Include="dbo\Stored Procedures\usp_SecurityEvent_GetTypeCounts.sql" />
