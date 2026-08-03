@@ -1,66 +1,158 @@
-WorkProvider360 — Database Project
-SQL Server database for WorkProvider360, a multi-tenant SaaS. This is an SSDT database project (.sqlproj, SQL Server 2022) that defines the per-tenant (agency) database schema. It builds to a DACPAC and is published to each tenant database.
+# WorkProvider360 Database
 
-Multi-tenant note: this project is the tenant template (one physical database per agency). The shared master database — which holds the Agencies catalog and each tenant's connection string — is managed separately.
+Enterprise-grade SQL Server database project powering the **WorkProvider360** multi-tenant SaaS platform.
 
-Requirements
-SQL Server 2022 (or Azure SQL) target
-Visual Studio 2022+ with SQL Server Data Tools (SSDT), or MSBuild with SSDT targets
-SqlPackage.exe (for command-line publish)
-PowerShell (for the multi-tenant deploy script)
-Project layout
-WorkProvider360/
-├─ WorkProvider360.sqlproj        # project file — every object is registered here as <Build>
-├─ dbo/
-│  ├─ Tables/                     # one CREATE TABLE per .sql file
-│  └─ Stored Procedures/          # usp_<Entity>_<Action>.sql
-├─ Storage/                       # full-text catalog etc.
-├─ Script.PostDeployment.sql      # idempotent reference-data seed (runs after every publish)
-Scripts/
-└─ Deploy-AllTenants.ps1          # publishes the DACPAC to every active tenant
-⚠️ The project is not wildcard-based. When you add a .sql file you must also add a matching <Build Include="..." /> entry in WorkProvider360.sqlproj, or it won't be compiled.
+This repository contains the complete tenant database definition built with **SQL Server Data Tools (SSDT)**. The project compiles into a **DACPAC**, enabling repeatable, version-controlled deployments across every tenant database while maintaining a consistent schema.
 
-Schema overview (tenant database)
-Area	Tables
-Identity & auth	                  Roles, Users, RefreshTokens, PasswordResetTokens
-Hiring / onboarding             	RoleApplications, ApplicationAnswers, ApplicationQuestions, ApplicationSettings
-Offices & time                  	Office, Timezone
-Scheduling	                      Schedules, ScheduleNotes, TimeEntries, LocationPings, SchedulingSettings
-Comms & ops	                      Announcement, AnnouncementSettings, EmailLog, LogSettings, Branding
-Money	                            Invoice, PosTransaction, PosFeeSettings
-Each table has matching stored procedures (usp_<Entity>_<Action>) — the application reads/writes only through these procs (no inline SQL, no ORM).
+The architecture follows a **database-per-tenant** model, where every agency owns an isolated SQL Server database for maximum security, scalability, and data isolation.
 
-Conventions
-Keys: core tables use INT IDENTITY; newer feature tables use UNIQUEIDENTIFIER DEFAULT (newid()).
-Stored procedures: named usp_<Entity>_<Action> (e.g. usp_User_Create, usp_Invoice_GetAll). SELECT column names match the app's entity property names so Dapper maps automatically.
-Singleton settings tables: a single row keyed SettingsId = 1, managed by an _Upsert proc (ApplicationSettings, SchedulingSettings, LogSettings, AnnouncementSettings, PosFeeSettings, Branding).
-Timestamps: DATETIME2(7) with DEFAULT (sysutcdatetime()).
-Roles are static across all tenants: 1 SuperAdmin, 2 Admin, 3 Manager, 4 User.
-Post-deployment seeding
-Script.PostDeployment.sql runs after every publish and is idempotent (WHERE NOT EXISTS / SettingsId = 1 upserts) — safe to run repeatedly. It seeds reference data such as the Timezone list. Add new idempotent seeds here.
+> **Tenant Database:** This repository
+> **Master Database:** Managed separately (stores agency catalog, tenant connection strings, and tenant discovery)
 
-Build
-Visual Studio: open the solution and Build. Command line (needs VS MSBuild, not dotnet build):
+---
 
-"C:\Program Files\Microsoft Visual Studio\18\Enterprise\MSBuild\Current\Bin\MSBuild.exe" WorkProvider360\WorkProvider360.sqlproj -t:Build
-Output: WorkProvider360\bin\Debug\WorkProvider360.dacpac.
+## 🚀 Key Features
 
-Publish / deploy
-Single database (SqlPackage):
+* SQL Server 2022 SSDT Database Project
+* DACPAC-based CI/CD deployment
+* Database-per-tenant SaaS architecture
+* Version-controlled schema management
+* Automated multi-tenant deployment
+* Idempotent post-deployment data seeding
+* Dapper-optimized stored procedures
+* Enterprise naming conventions
+* SQL Server & Azure SQL compatible
 
-SqlPackage /Action:Publish ^
-  /SourceFile:"bin\Debug\WorkProvider360.dacpac" ^
-  /TargetConnectionString:"Server=<server>;Database=<tenantDb>;User Id=<u>;Password=<p>;Encrypt=False" ^
-  /p:BlockOnPossibleDataLoss=False
-All tenants: run Scripts\Deploy-AllTenants.ps1 — it reads active agencies from the master DB (SELECT ... FROM Agencies WHERE IsActive=1 AND IsArchived=0) and publishes the DACPAC to each tenant database in turn.
+---
 
-Adding a new object (checklist)
-Add dbo\Tables\<Name>.sql (and any usp_<Name>_*.sql).
-Register each new file as <Build Include="..." /> in WorkProvider360.sqlproj.
-Follow the conventions above (GUID vs int, usp_ naming, matching column names).
-If it needs seed/reference data, add an idempotent block to Script.PostDeployment.sql.
-Build → publish the DACPAC to the tenant DB(s).
-Notes
-⚠️ Two procs (usp_Agency_GetByDomain, usp_Agency_GetById) reference dbo.Agencies, which lives in the master DB — SSDT will show unresolved-reference warnings (SQL71501). Expected; they run against the master at runtime.
-⚠️ Don't name new folders/files logs — the repo's .gitignore has a [Ll]ogs/ rule that would silently exclude them.
-Keep real secrets out of any checked-in scripts; use env vars / secure connection strings at deploy time.
+## 🏗 Architecture
+
+```
+                   Master Database
+        +----------------------------------+
+        | Agencies                         |
+        | Tenant Connection Strings        |
+        | Domain Mapping                   |
+        +----------------+-----------------+
+                         |
+        -----------------------------------------
+        |               |               |
+        ▼               ▼               ▼
++----------------+ +----------------+ +----------------+
+| Agency DB 1    | | Agency DB 2    | | Agency DB N    |
+| (Tenant)       | | (Tenant)       | | (Tenant)       |
++----------------+ +----------------+ +----------------+
+```
+
+Each tenant database is generated from this SSDT project, ensuring every agency runs an identical, fully version-controlled schema.
+
+---
+
+## 📦 Technology Stack
+
+* SQL Server 2022
+* SQL Server Data Tools (SSDT)
+* Visual Studio 2022
+* MSBuild
+* SqlPackage
+* PowerShell
+* Dapper
+
+---
+
+## 📁 Project Structure
+
+```
+WorkProvider360
+│
+├── WorkProvider360.sqlproj
+├── dbo
+│   ├── Tables
+│   ├── Stored Procedures
+│   ├── Views
+│   └── Functions
+│
+├── Storage
+├── Script.PostDeployment.sql
+│
+└── Scripts
+    └── Deploy-AllTenants.ps1
+```
+
+> **Important:** SSDT does not automatically include new SQL objects. Every new `.sql` file **must** be registered inside `WorkProvider360.sqlproj`; otherwise it will not be compiled into the DACPAC.
+
+---
+
+## 🛠 Design Principles
+
+* Database-first development
+* Stored procedure–only data access
+* Zero inline SQL from the application
+* Dapper-friendly result sets
+* Idempotent deployments
+* Version-controlled database changes
+* Automated tenant provisioning
+* Enterprise deployment workflow
+
+---
+
+## 📊 Database Modules
+
+| Module              | Components                                        |
+| ------------------- | ------------------------------------------------- |
+| Identity & Security | Roles, Users, Refresh Tokens, Password Reset      |
+| Hiring & Onboarding | Applications, Questions, Answers                  |
+| Scheduling          | Schedules, Notes, Time Entries, Location Tracking |
+| Office Management   | Offices, Timezones                                |
+| Communication       | Announcements, Branding, Email Logs               |
+| Financial           | Invoices, POS Transactions, Fee Settings          |
+| System Settings     | Application, Scheduling, Logging, Branding        |
+
+---
+
+## 🚀 Deployment Workflow
+
+```
+Developer
+      │
+      ▼
+Modify SQL Objects
+      │
+      ▼
+Build SSDT Project
+      │
+      ▼
+Generate DACPAC
+      │
+      ▼
+Deploy via SqlPackage
+      │
+      ▼
+Deploy-AllTenants.ps1
+      │
+      ▼
+All Active Tenant Databases
+```
+
+Every deployment is repeatable, version-controlled, and safe for production environments.
+
+---
+
+## 🔒 Database Standards
+
+* INT IDENTITY for core entities
+* UNIQUEIDENTIFIER for modern feature modules
+* DATETIME2(7) UTC timestamps
+* Idempotent reference data seeding
+* Singleton configuration tables
+* Consistent stored procedure naming (`usp_*`)
+* Column names aligned with Dapper entity mapping
+* Safe post-deployment execution
+
+---
+
+## ⚠ Important Notes
+
+* `usp_Agency_GetByDomain` and `usp_Agency_GetById` reference the master database and may generate expected SSDT unresolved-reference warnings.
+* Avoid naming folders **Logs**, as repository ignore rules exclude them.
+* Never commit production credentials or secrets. Use secure deployment variables or environment-specific configuration.
