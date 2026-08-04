@@ -33,7 +33,7 @@ BEGIN
     SELECT
         u.UserId, u.Email, u.FullName, u.PasswordHash, u.PasswordSalt,
         u.RoleId, r.RoleName, u.Phone, u.AvatarUrl, u.OfficeId, o.OfficeName, u.Salary,
-        u.IsActive, u.CreatedOn, u.UpdatedOn
+        u.IsActive, u.AccessFailedCount, u.IsLockedOut, u.CreatedOn, u.UpdatedOn
     FROM dbo.Users u
     INNER JOIN dbo.Roles r ON r.RoleId = u.RoleId
     LEFT JOIN dbo.Office o ON o.OfficeId = u.OfficeId

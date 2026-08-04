@@ -15,7 +15,8 @@ BEGIN
     SET NOCOUNT ON;
     SELECT
         u.UserId, u.Email, u.FullName, u.PasswordHash, u.PasswordSalt,
-        u.RoleId, r.RoleName, u.Phone, u.AvatarUrl, u.IsActive, u.CreatedOn, u.UpdatedOn
+        u.RoleId, r.RoleName, u.Phone, u.AvatarUrl, u.IsActive,
+        u.AccessFailedCount, u.IsLockedOut, u.CreatedOn, u.UpdatedOn
     FROM dbo.Users u
     INNER JOIN dbo.Roles r ON r.RoleId = u.RoleId
     WHERE u.Email = @Email;

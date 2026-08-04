@@ -95,6 +95,9 @@
     <Build Include="dbo\Stored Procedures\usp_User_GetAll.sql" />
     <Build Include="dbo\Stored Procedures\usp_User_GetPaged.sql" />
     <Build Include="dbo\Stored Procedures\usp_User_UpdateAvatar.sql" />
+    <Build Include="dbo\Stored Procedures\usp_User_RegisterFailedLogin.sql" />
+    <Build Include="dbo\Stored Procedures\usp_User_ResetFailedLogin.sql" />
+    <Build Include="dbo\Stored Procedures\usp_User_SetLockout.sql" />
     <Build Include="dbo\Stored Procedures\usp_GetTimezonesForDropdown.sql" />
     <Build Include="dbo\Stored Procedures\usp_User_EmailExists.sql" />
     <Build Include="dbo\Stored Procedures\usp_User_Create.sql" />

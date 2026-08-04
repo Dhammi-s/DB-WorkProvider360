@@ -14,7 +14,7 @@ CREATE   PROCEDURE dbo.usp_ApplicationSettings_Get
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT SettingsId, RequirePhone, RequireAddress, EmailNotificationsEnabled, NotificationEmail, UpdatedOn
+    SELECT SettingsId, RequirePhone, RequireAddress, EmailNotificationsEnabled, NotificationEmail, AllowStaffUnlock, UpdatedOn
     FROM dbo.ApplicationSettings
     WHERE SettingsId = 1;
 END
