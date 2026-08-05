@@ -13,6 +13,7 @@
 CREATE   PROCEDURE dbo.usp_Agency_GetByDomain
     @DomainUrl NVARCHAR(256)
    --jassa
+   --testdeploy
 AS
 BEGIN
     SET NOCOUNT ON;
