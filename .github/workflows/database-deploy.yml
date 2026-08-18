@@ -1,20 +1,13 @@
 name: Deploy SQL Database
 
 on:
-  push:
-    branches:
-      - master
-
   workflow_dispatch:
 
 jobs:
-
   deploy:
-
     runs-on: windows-latest
 
     steps:
-
       - uses: actions/checkout@v4
 
       - uses: microsoft/setup-msbuild@v2
@@ -38,6 +31,17 @@ jobs:
         shell: powershell
         run: |
           sqlpackage /Version
+
+      - name: Generate SQL Scripts
+        shell: powershell
+        run: |
+          .\Scripts\Deploy-AllTenants.ps1 -GenerateScript
+
+      - name: Upload SQL Scripts
+        uses: actions/upload-artifact@v4
+        with:
+          name: SQL-Deployment-Scripts
+          path: Scripts\Output\*.sql
 
       - name: Deploy
         shell: powershell
