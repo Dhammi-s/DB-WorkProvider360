@@ -1,50 +1,175 @@
-name: Deploy SaaS Databases
+param(
+    [switch]$GenerateScript
+)
 
-on:
-  workflow_dispatch:
+Import-Module SqlServer -ErrorAction Stop
 
-jobs:
-  deploy:
-    runs-on: windows-latest
+Write-Host "========================================"
+Write-Host " SaaS Database Deployment Started"
+Write-Host "========================================"
 
-    env:
-      MASTER_CONNECTION_STRING: ${{ secrets.MASTER_CONNECTION_STRING }}
+# ----------------------------------------------------
+# MASTER DATABASE
+# ----------------------------------------------------
 
-    steps:
+$MasterConnection = "Server=188.40.211.2;Database=db38045;User ID=db38045;Password=X%n3@4Wp7Pj+;Encrypt=True;TrustServerCertificate=True;"
 
-      # -----------------------------------------
-      # Checkout Repository
-      # -----------------------------------------
+# ----------------------------------------------------
+# TEST MASTER CONNECTION
+# ----------------------------------------------------
 
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+Write-Host ""
+Write-Host "Testing Master Database..."
 
-      # -----------------------------------------
-      # Setup .NET
-      # -----------------------------------------
+try
+{
+    $cn = New-Object System.Data.SqlClient.SqlConnection($MasterConnection)
+    $cn.Open()
+    Write-Host "Connected Successfully"
+    $cn.Close()
+}
+catch
+{
+    Write-Host "Connection Failed"
+    Write-Host $_.Exception.Message
+    exit 1
+}
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
+# ----------------------------------------------------
+# GET AGENCIES
+# ----------------------------------------------------
 
-      # -----------------------------------------
-      # Install SqlServer PowerShell Module
-      # -----------------------------------------
+Write-Host ""
+Write-Host "Reading Agencies..."
 
-      - name: Install SqlServer Module
-        shell: powershell
-        run: |
-          Install-Module SqlServer `
-            -Force `
-            -AllowClobber `
-            -Scope CurrentUser
+$Agencies = Invoke-Sqlcmd `
+    -ConnectionString $MasterConnection `
+    -Query @"
 
-      # -----------------------------------------
-      # Run Deployment
-      # -----------------------------------------
+SELECT
+    AgencyId,
+    AgencyName,
+    DbServer,
+    DbName,
+    DbUser,
+    DbPassword
+FROM Agencies
+WHERE IsActive = 1
+AND IsArchived = 0
+ORDER BY AgencyId
 
-      - name: Deploy Databases
-        shell: powershell
-        run: |
-          .\Deploy-AllTenants.ps1
+"@
+
+Write-Host "Total Agencies : $($Agencies.Count)"
+
+# ----------------------------------------------------
+# FIND DACPAC
+# ----------------------------------------------------
+
+$Dacpac = Get-ChildItem -Recurse -Filter *.dacpac | Select-Object -First 1
+
+if($null -eq $Dacpac)
+{
+    throw "DACPAC Not Found."
+}
+
+Write-Host ""
+Write-Host "DACPAC : $($Dacpac.FullName)"
+
+# ----------------------------------------------------
+# FIND SQLPACKAGE
+# ----------------------------------------------------
+
+$sqlPackage = (Get-Command sqlpackage -ErrorAction Stop).Source
+
+Write-Host "SqlPackage : $sqlPackage"
+
+# ----------------------------------------------------
+# CREATE OUTPUT FOLDER
+# ----------------------------------------------------
+
+$OutputFolder = Join-Path $PSScriptRoot "Output"
+
+if(!(Test-Path $OutputFolder))
+{
+    New-Item -ItemType Directory -Path $OutputFolder | Out-Null
+}
+
+# ----------------------------------------------------
+# PROCESS TENANTS
+# ----------------------------------------------------
+
+foreach($Agency in $Agencies)
+{
+    Write-Host ""
+    Write-Host "========================================"
+    Write-Host "Processing : $($Agency.AgencyName)"
+    Write-Host "========================================"
+
+    $TargetConnection = @"
+Server=$($Agency.DbServer);
+Database=$($Agency.DbName);
+User ID=$($Agency.DbUser);
+Password=$($Agency.DbPassword);
+Encrypt=False;
+TrustServerCertificate=True;
+"@.Replace("`r","").Replace("`n","")
+
+    if($GenerateScript)
+    {
+        $ScriptFile = Join-Path $OutputFolder "$($Agency.DbName).sql"
+
+        Write-Host "Generating Script : $ScriptFile"
+
+        & $sqlPackage `
+            "/Action:Script" `
+            "/SourceFile:$($Dacpac.FullName)" `
+            "/TargetConnectionString:$TargetConnection" `
+            "/OutputPath:$ScriptFile" `
+            "/p:BlockOnPossibleDataLoss=False" `
+            "/p:DropObjectsNotInSource=False"
+    }
+    else
+    {
+        Write-Host "Deploying : $($Agency.DbName)"
+
+        & $sqlPackage `
+            "/Action:Publish" `
+            "/SourceFile:$($Dacpac.FullName)" `
+            "/TargetConnectionString:$TargetConnection" `
+            "/p:BlockOnPossibleDataLoss=False" `
+            "/p:DropObjectsNotInSource=False"
+    }
+
+    if($LASTEXITCODE -eq 0)
+    {
+        if($GenerateScript)
+        {
+            Write-Host "Script Generated Successfully"
+        }
+        else
+        {
+            Write-Host "Deployment Successful"
+        }
+    }
+    else
+    {
+        Write-Host "FAILED"
+        exit $LASTEXITCODE
+    }
+}
+
+Write-Host ""
+Write-Host "========================================"
+
+if($GenerateScript)
+{
+    Write-Host " ALL SQL SCRIPTS GENERATED SUCCESSFULLY"
+    Write-Host " Output Folder : $OutputFolder"
+}
+else
+{
+    Write-Host " ALL DATABASES DEPLOYED SUCCESSFULLY"
+}
+
+Write-Host "========================================"
