@@ -1,128 +1,50 @@
-Import-Module SqlServer -ErrorAction Stop
+name: Deploy SaaS Databases
 
-Write-Host "========================================"
-Write-Host " SaaS Database Deployment Started"
-Write-Host "========================================"
+on:
+  workflow_dispatch:
 
-# ----------------------------------------------------
-# MASTER DATABASE
-# ----------------------------------------------------
+jobs:
+  deploy:
+    runs-on: windows-latest
 
-$MasterConnection = "Server=188.40.211.2;Database=db38045;User ID=db38045;Password=X%n3@4Wp7Pj+;Encrypt=True;TrustServerCertificate=True;"
+    env:
+      MASTER_CONNECTION_STRING: ${{ secrets.MASTER_CONNECTION_STRING }}
 
-# ----------------------------------------------------
-# TEST MASTER CONNECTION
-# ----------------------------------------------------
+    steps:
 
-Write-Host ""
-Write-Host "Testing Master Database..."
+      # -----------------------------------------
+      # Checkout Repository
+      # -----------------------------------------
 
-try
-{
-    $cn = New-Object System.Data.SqlClient.SqlConnection($MasterConnection)
-    $cn.Open()
-    Write-Host "Connected Successfully"
-    $cn.Close()
-}
-catch
-{
-    Write-Host "Connection Failed"
-    Write-Host $_.Exception.Message
-    exit 1
-}
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-# ----------------------------------------------------
-# GET AGENCIES
-# ----------------------------------------------------
+      # -----------------------------------------
+      # Setup .NET
+      # -----------------------------------------
 
-Write-Host ""
-Write-Host "Reading Agencies..."
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
 
-$Agencies = Invoke-Sqlcmd `
-    -ConnectionString $MasterConnection `
-    -Query @"
+      # -----------------------------------------
+      # Install SqlServer PowerShell Module
+      # -----------------------------------------
 
-SELECT
-    AgencyId,
-    AgencyName,
-    DbServer,
-    DbName,
-    DbUser,
-    DbPassword
-FROM Agencies
-WHERE IsActive = 1
-AND IsArchived = 0
-ORDER BY AgencyId
+      - name: Install SqlServer Module
+        shell: powershell
+        run: |
+          Install-Module SqlServer `
+            -Force `
+            -AllowClobber `
+            -Scope CurrentUser
 
-"@
+      # -----------------------------------------
+      # Run Deployment
+      # -----------------------------------------
 
-Write-Host "Total Agencies : $($Agencies.Count)"
-
-# ----------------------------------------------------
-# FIND DACPAC
-# ----------------------------------------------------
-
-$Dacpac = Get-ChildItem -Recurse -Filter *.dacpac | Select-Object -First 1
-
-if($null -eq $Dacpac)
-{
-    throw "DACPAC Not Found."
-}
-
-Write-Host ""
-Write-Host "DACPAC : $($Dacpac.FullName)"
-
-# ----------------------------------------------------
-# FIND SQLPACKAGE
-# ----------------------------------------------------
-
-$sqlPackage = (Get-Command sqlpackage -ErrorAction Stop).Source
-
-Write-Host "SqlPackage : $sqlPackage"
-
-# ----------------------------------------------------
-# DEPLOY
-# ----------------------------------------------------
-
-foreach($Agency in $Agencies)
-{
-
-    Write-Host ""
-    Write-Host "========================================"
-    Write-Host "Deploying : $($Agency.AgencyName)"
-    Write-Host "========================================"
-
-    $TargetConnection = @"
-Server=$($Agency.DbServer);
-Database=$($Agency.DbName);
-User ID=$($Agency.DbUser);
-Password=$($Agency.DbPassword);
-Encrypt=False;
-TrustServerCertificate=True;
-"@.Replace("`r","").Replace("`n","")
-
-    Write-Host "Database : $($Agency.DbName)"
-
-    & $sqlPackage `
-        "/Action:Publish" `
-        "/SourceFile:$($Dacpac.FullName)" `
-        "/TargetConnectionString:$TargetConnection" `
-        "/p:BlockOnPossibleDataLoss=False" `
-        "/p:DropObjectsNotInSource=False"
-
-    if($LASTEXITCODE -eq 0)
-    {
-        Write-Host "SUCCESS"
-    }
-    else
-    {
-        Write-Host "FAILED"
-        exit $LASTEXITCODE
-    }
-
-}
-
-Write-Host ""
-Write-Host "========================================"
-Write-Host " ALL DATABASES DEPLOYED SUCCESSFULLY"
-Write-Host "========================================"
+      - name: Deploy Databases
+        shell: powershell
+        run: |
+          .\Deploy-AllTenants.ps1
