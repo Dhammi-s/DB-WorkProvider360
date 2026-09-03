@@ -6,7 +6,6 @@
    SaaS architecture. PLEASE FIRST DISCUSS WITH SOFTWARE ENGINEER JASMEET SINGH.
    ============================================================================= */
 
-
 CREATE   PROCEDURE dbo.usp_Office_GetMembers
     @OfficeId UNIQUEIDENTIFIER
 AS
@@ -23,5 +22,6 @@ BEGIN
     FROM dbo.Users u
     INNER JOIN dbo.Roles r ON r.RoleId = u.RoleId
     WHERE u.OfficeId = @OfficeId
+      AND r.RoleName <> N'Client'
     ORDER BY u.RoleId, u.FullName;
 END

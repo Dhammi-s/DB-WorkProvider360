@@ -6,15 +6,14 @@
    SaaS architecture. PLEASE FIRST DISCUSS WITH SOFTWARE ENGINEER JASMEET SINGH.
    ============================================================================= */
 
-
-/* =============================== PROCEDURES ================================= */
-
 /* ------------------------- ApplicationSettings --------------------------- */
 CREATE   PROCEDURE dbo.usp_ApplicationSettings_Get
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT SettingsId, RequirePhone, RequireAddress, EmailNotificationsEnabled, NotificationEmail, AllowStaffUnlock, UpdatedOn
+    SELECT SettingsId, RequirePhone, RequireAddress, EmailNotificationsEnabled, NotificationEmail,
+           AllowStaffUnlock, RequireQualifications, RequireSkills, RequireAvailability, RequireDateOfBirth,
+           UpdatedOn
     FROM dbo.ApplicationSettings
     WHERE SettingsId = 1;
 END

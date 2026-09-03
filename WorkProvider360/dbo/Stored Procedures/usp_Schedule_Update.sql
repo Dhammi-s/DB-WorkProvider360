@@ -6,12 +6,13 @@
    SaaS architecture. PLEASE FIRST DISCUSS WITH SOFTWARE ENGINEER JASMEET SINGH.
    ============================================================================= */
 
-
 CREATE   PROCEDURE dbo.usp_Schedule_Update
     @ScheduleId         INT,
     @Title              NVARCHAR(200),
     @CustomerName       NVARCHAR(200) = NULL,
     @Location           NVARCHAR(300) = NULL,
+    @ClientId           INT           = NULL,
+    @ServiceTypeId      INT           = NULL,
     @AssignedUserId     INT,
     @StartUtc           DATETIME2(7),
     @EndUtc             DATETIME2(7),
@@ -25,6 +26,8 @@ BEGIN
     SET Title = @Title,
         CustomerName = @CustomerName,
         Location = @Location,
+        ClientId = @ClientId,
+        ServiceTypeId = @ServiceTypeId,
         AssignedUserId = @AssignedUserId,
         StartUtc = @StartUtc,
         EndUtc = @EndUtc,

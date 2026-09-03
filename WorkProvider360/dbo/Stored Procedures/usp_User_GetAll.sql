@@ -6,7 +6,8 @@
    SaaS architecture. PLEASE FIRST DISCUSS WITH SOFTWARE ENGINEER JASMEET SINGH.
    ============================================================================= */
 
-
+/* All staff users. Portal clients (RoleName 'Client') are excluded so they
+   never appear in the team list, assignable-user picks or email recipient sets. */
 CREATE   PROCEDURE dbo.usp_User_GetAll
 AS
 BEGIN
@@ -18,5 +19,6 @@ BEGIN
     FROM dbo.Users u
     INNER JOIN dbo.Roles r ON r.RoleId = u.RoleId
     LEFT JOIN dbo.Office o ON o.OfficeId = u.OfficeId
+    WHERE r.RoleName <> N'Client'
     ORDER BY u.UserId;
 END

@@ -6,13 +6,16 @@
    SaaS architecture. PLEASE FIRST DISCUSS WITH SOFTWARE ENGINEER JASMEET SINGH.
    ============================================================================= */
 
-
 CREATE   PROCEDURE dbo.usp_ApplicationSettings_Upsert
     @RequirePhone              BIT,
     @RequireAddress            BIT,
     @EmailNotificationsEnabled BIT,
     @NotificationEmail         NVARCHAR(256) = NULL,
-    @AllowStaffUnlock          BIT = 0
+    @AllowStaffUnlock          BIT = 0,
+    @RequireQualifications     BIT = 0,
+    @RequireSkills             BIT = 1,
+    @RequireAvailability       BIT = 0,
+    @RequireDateOfBirth        BIT = 0
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -25,16 +28,26 @@ BEGIN
             EmailNotificationsEnabled = @EmailNotificationsEnabled,
             NotificationEmail = @NotificationEmail,
             AllowStaffUnlock = @AllowStaffUnlock,
+            RequireQualifications = @RequireQualifications,
+            RequireSkills = @RequireSkills,
+            RequireAvailability = @RequireAvailability,
+            RequireDateOfBirth = @RequireDateOfBirth,
             UpdatedOn = SYSUTCDATETIME()
         WHERE SettingsId = 1;
     END
     ELSE
     BEGIN
-        INSERT INTO dbo.ApplicationSettings (SettingsId, RequirePhone, RequireAddress, EmailNotificationsEnabled, NotificationEmail, AllowStaffUnlock)
-        VALUES (1, @RequirePhone, @RequireAddress, @EmailNotificationsEnabled, @NotificationEmail, @AllowStaffUnlock);
+        INSERT INTO dbo.ApplicationSettings
+            (SettingsId, RequirePhone, RequireAddress, EmailNotificationsEnabled, NotificationEmail,
+             AllowStaffUnlock, RequireQualifications, RequireSkills, RequireAvailability, RequireDateOfBirth)
+        VALUES
+            (1, @RequirePhone, @RequireAddress, @EmailNotificationsEnabled, @NotificationEmail,
+             @AllowStaffUnlock, @RequireQualifications, @RequireSkills, @RequireAvailability, @RequireDateOfBirth);
     END
 
-    SELECT SettingsId, RequirePhone, RequireAddress, EmailNotificationsEnabled, NotificationEmail, AllowStaffUnlock, UpdatedOn
+    SELECT SettingsId, RequirePhone, RequireAddress, EmailNotificationsEnabled, NotificationEmail,
+           AllowStaffUnlock, RequireQualifications, RequireSkills, RequireAvailability, RequireDateOfBirth,
+           UpdatedOn
     FROM dbo.ApplicationSettings
     WHERE SettingsId = 1;
 END

@@ -13,7 +13,10 @@ CREATE TABLE [dbo].[ApplicationSettings] (
     [EmailNotificationsEnabled] BIT            CONSTRAINT [DF_AppSettings_Email] DEFAULT ((1)) NOT NULL,
     [NotificationEmail]         NVARCHAR (256) NULL,
     [AllowStaffUnlock]          BIT            CONSTRAINT [DF_AppSettings_AllowStaffUnlock] DEFAULT ((0)) NOT NULL,
+    [RequireQualifications]     BIT            CONSTRAINT [DF_AppSettings_RequireQualifications] DEFAULT ((0)) NOT NULL,
+    [RequireSkills]             BIT            CONSTRAINT [DF_AppSettings_RequireSkills] DEFAULT ((1)) NOT NULL,
+    [RequireAvailability]       BIT            CONSTRAINT [DF_AppSettings_RequireAvailability] DEFAULT ((0)) NOT NULL,
+    [RequireDateOfBirth]        BIT            CONSTRAINT [DF_AppSettings_RequireDateOfBirth] DEFAULT ((0)) NOT NULL,
     [UpdatedOn]                 DATETIME2 (7)  CONSTRAINT [DF_AppSettings_UpdatedOn] DEFAULT (sysutcdatetime()) NOT NULL,
     CONSTRAINT [PK_ApplicationSettings] PRIMARY KEY CLUSTERED ([SettingsId] ASC)
 );
-

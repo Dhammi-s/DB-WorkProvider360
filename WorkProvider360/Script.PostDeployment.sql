@@ -112,7 +112,8 @@ FROM (VALUES
     (1, N'SuperAdmin'),
     (2, N'Admin'),
     (3, N'Manager'),
-    (4, N'User')
+    (4, N'User'),
+    (5, N'Client')
 ) AS v (RoleId, RoleName)
 WHERE NOT EXISTS (SELECT 1 FROM dbo.Roles r WHERE r.RoleId = v.RoleId);
 
@@ -140,4 +141,36 @@ BEGIN
         NULL,
         1
     );
+END
+
+
+/* ---------------------------------------------------------------------------
+   Seed the default service types (the tenant-editable list of services/skills:
+   nursing, cleaning, gardening, car wash, driving, ...). Idempotent: existing
+   names are skipped, so tenant edits and additions are never overwritten.
+   --------------------------------------------------------------------------- */
+INSERT INTO dbo.ServiceTypes (Name, Description, Category, ColorTag, SortOrder, IsActive)
+SELECT v.Name, v.Description, v.Category, v.ColorTag, v.SortOrder, 1
+FROM (VALUES
+    (N'Nursing',       N'Skilled and personal nursing care in the client home.', N'Care',      N'#ef4444', 10),
+    (N'Personal Care', N'Bathing, dressing, grooming and daily-living support.',  N'Care',      N'#f97316', 20),
+    (N'Companionship', N'Company, conversation and supervision.',                 N'Care',      N'#8b5cf6', 30),
+    (N'Cleaning',      N'House cleaning and housekeeping.',                        N'Household', N'#0ea5e9', 40),
+    (N'Cooking',       N'Meal preparation and cooking.',                          N'Household', N'#14b8a6', 50),
+    (N'Gardening',     N'Lawn, garden and outdoor maintenance.',                  N'Outdoor',   N'#22c55e', 60),
+    (N'Car Wash',      N'Vehicle washing and detailing.',                         N'Outdoor',   N'#3b82f6', 70),
+    (N'Driving',       N'Transport, errands and appointment drop-off.',           N'Transport', N'#eab308', 80)
+) AS v (Name, Description, Category, ColorTag, SortOrder)
+WHERE NOT EXISTS (SELECT 1 FROM dbo.ServiceTypes st WHERE st.Name = v.Name);
+
+
+/* ---------------------------------------------------------------------------
+   Seed the client / visit / portal settings (single row, SettingsId = 1) with
+   the column defaults. Idempotent: only inserts when the row is missing, so
+   SuperAdmin edits are never overwritten. Ensures usp_ClientSettings_Get never
+   returns zero rows on a freshly provisioned tenant.
+   --------------------------------------------------------------------------- */
+IF NOT EXISTS (SELECT 1 FROM dbo.ClientSettings WHERE SettingsId = 1)
+BEGIN
+    INSERT INTO dbo.ClientSettings (SettingsId) VALUES (1);
 END

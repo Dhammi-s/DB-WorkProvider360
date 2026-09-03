@@ -6,7 +6,6 @@
    SaaS architecture. PLEASE FIRST DISCUSS WITH SOFTWARE ENGINEER JASMEET SINGH.
    ============================================================================= */
 
-
 CREATE   PROCEDURE dbo.usp_User_GetPaged
     @Page     INT = 1,
     @PageSize INT = 10,
@@ -24,7 +23,8 @@ BEGIN
         SELECT u.UserId
         FROM dbo.Users u
         INNER JOIN dbo.Roles r ON r.RoleId = u.RoleId
-        WHERE (@RoleName IS NULL OR r.RoleName = @RoleName)
+        WHERE r.RoleName <> N'Client'
+          AND (@RoleName IS NULL OR r.RoleName = @RoleName)
           AND (
                 (@NoOffice = 1 AND u.OfficeId IS NULL)
              OR (@NoOffice = 0 AND (@OfficeId IS NULL OR u.OfficeId = @OfficeId))
@@ -44,7 +44,8 @@ BEGIN
     SELECT COUNT(*) AS Total
     FROM dbo.Users u
     INNER JOIN dbo.Roles r ON r.RoleId = u.RoleId
-    WHERE (@RoleName IS NULL OR r.RoleName = @RoleName)
+    WHERE r.RoleName <> N'Client'
+      AND (@RoleName IS NULL OR r.RoleName = @RoleName)
       AND (
             (@NoOffice = 1 AND u.OfficeId IS NULL)
          OR (@NoOffice = 0 AND (@OfficeId IS NULL OR u.OfficeId = @OfficeId))

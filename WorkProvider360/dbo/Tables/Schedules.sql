@@ -11,6 +11,8 @@ CREATE TABLE [dbo].[Schedules] (
     [Title]              NVARCHAR (200)  NOT NULL,
     [CustomerName]       NVARCHAR (200)  NULL,
     [Location]           NVARCHAR (300)  NULL,
+    [ClientId]           INT             NULL,
+    [ServiceTypeId]      INT             NULL,
     [AssignedUserId]     INT             NOT NULL,
     [StartUtc]           DATETIME2 (7)   NOT NULL,
     [EndUtc]             DATETIME2 (7)   NOT NULL,
@@ -24,7 +26,9 @@ CREATE TABLE [dbo].[Schedules] (
     [UpdatedOn]          DATETIME2 (7)   CONSTRAINT [DF_Schedules_UpdatedOn] DEFAULT (sysutcdatetime()) NOT NULL,
     CONSTRAINT [PK_Schedules] PRIMARY KEY CLUSTERED ([ScheduleId] ASC),
     CONSTRAINT [FK_Schedules_AssignedUser] FOREIGN KEY ([AssignedUserId]) REFERENCES [dbo].[Users] ([UserId]),
-    CONSTRAINT [FK_Schedules_CreatedBy] FOREIGN KEY ([CreatedByUserId]) REFERENCES [dbo].[Users] ([UserId])
+    CONSTRAINT [FK_Schedules_CreatedBy] FOREIGN KEY ([CreatedByUserId]) REFERENCES [dbo].[Users] ([UserId]),
+    CONSTRAINT [FK_Schedules_Clients] FOREIGN KEY ([ClientId]) REFERENCES [dbo].[Clients] ([ClientId]),
+    CONSTRAINT [FK_Schedules_ServiceTypes] FOREIGN KEY ([ServiceTypeId]) REFERENCES [dbo].[ServiceTypes] ([ServiceTypeId])
 );
 
 
@@ -37,3 +41,7 @@ GO
 CREATE NONCLUSTERED INDEX [IX_Schedules_StartUtc]
     ON [dbo].[Schedules]([StartUtc] ASC);
 
+
+GO
+CREATE NONCLUSTERED INDEX [IX_Schedules_ClientId]
+    ON [dbo].[Schedules]([ClientId] ASC);
