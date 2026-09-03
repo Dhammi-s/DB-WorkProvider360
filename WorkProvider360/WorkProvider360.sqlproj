@@ -239,6 +239,9 @@
     <Build Include="dbo\Stored Procedures\usp_TimeEntrySignature_GetByTimeEntry.sql" />
     <Build Include="dbo\Stored Procedures\usp_Schedule_ApplyAutoClockPhases.sql" />
     <Build Include="dbo\Stored Procedures\usp_Schedule_GetByClient.sql" />
+    <Build Include="dbo\Tables\UserShortcuts.sql" />
+    <Build Include="dbo\Stored Procedures\usp_UserShortcut_GetByUser.sql" />
+    <Build Include="dbo\Stored Procedures\usp_UserShortcut_Replace.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />
