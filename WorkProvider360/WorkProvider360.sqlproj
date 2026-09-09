@@ -242,6 +242,24 @@
     <Build Include="dbo\Tables\UserShortcuts.sql" />
     <Build Include="dbo\Stored Procedures\usp_UserShortcut_GetByUser.sql" />
     <Build Include="dbo\Stored Procedures\usp_UserShortcut_Replace.sql" />
+    <Build Include="dbo\Tables\MeetingSettings.sql" />
+    <Build Include="dbo\Tables\Meetings.sql" />
+    <Build Include="dbo\Tables\MeetingParticipants.sql" />
+    <Build Include="dbo\Tables\MeetingPayments.sql" />
+    <Build Include="dbo\Stored Procedures\usp_MeetingSettings_Get.sql" />
+    <Build Include="dbo\Stored Procedures\usp_MeetingSettings_Update.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Meeting_Create.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Meeting_GetAll.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Meeting_GetById.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Meeting_Update.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Meeting_UpdateStatus.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Meeting_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Meeting_AddParticipant.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Meeting_GetParticipants.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Meeting_RemoveParticipant.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Meeting_RespondParticipant.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Meeting_RecordPayment.sql" />
+    <Build Include="dbo\Stored Procedures\usp_Meeting_GetPayments.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />
