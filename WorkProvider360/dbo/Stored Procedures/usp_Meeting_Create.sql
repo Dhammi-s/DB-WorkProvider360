@@ -16,7 +16,7 @@ CREATE PROCEDURE dbo.usp_Meeting_Create
     @IsPaid            BIT,
     @FeePerParticipant DECIMAL (10, 2),
     @CreatedByUserId   INT,
-    @CreatedByName     NVARCHAR (200),
+    @CreatedByName     NVARCHAR (200) = NULL,   -- optional; resolved from Users if not supplied
     @MaxParticipants   INT,
     @Notes             NVARCHAR (MAX),
     @ColorTag          NVARCHAR (20)
@@ -24,12 +24,17 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    -- Resolve creator name from Users if caller did not supply it
+    DECLARE @resolvedName NVARCHAR (200) = @CreatedByName;
+    IF @resolvedName IS NULL
+        SELECT @resolvedName = FullName FROM dbo.Users WHERE UserId = @CreatedByUserId;
+
     INSERT INTO dbo.Meetings
            (Title, Description, StartUtc, EndUtc, Location, MeetingType,
             IsPaid, FeePerParticipant, CreatedByUserId, CreatedByName,
             MaxParticipants, Notes, ColorTag)
     VALUES (@Title, @Description, @StartUtc, @EndUtc, @Location, @MeetingType,
-            @IsPaid, @FeePerParticipant, @CreatedByUserId, @CreatedByName,
+            @IsPaid, @FeePerParticipant, @CreatedByUserId, @resolvedName,
             @MaxParticipants, @Notes, @ColorTag);
 
     SELECT SCOPE_IDENTITY() AS MeetingId;

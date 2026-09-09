@@ -12,10 +12,26 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    SELECT PaymentId, MeetingId, ParticipantId, Amount, Method, Status,
-           TransactionId, Notes, PaidAt, RecordedByUserId, RecordedByName,
-           RecordedAt
-    FROM   dbo.MeetingPayments
-    WHERE  MeetingId = @MeetingId
-    ORDER  BY RecordedAt DESC;
+    SELECT pay.PaymentId,
+           pay.MeetingId,
+           pay.ParticipantId,
+           pay.Amount,
+           pay.Method,
+           pay.Status,
+           pay.TransactionId,
+           pay.Notes,
+           pay.PaidAt,
+           pay.RecordedByUserId,
+           pay.RecordedByName,
+           -- Participant info (joined for display)
+           mp.UserId                                                                        AS ParticipantUserId,
+           ISNULL(mp.ParticipantName, u.FullName)                                          AS ParticipantName,
+           mp.ClientId                                                                      AS ParticipantClientId,
+           NULLIF(RTRIM(ISNULL(c.FirstName, N'') + N' ' + ISNULL(c.LastName, N'')), N'')  AS ParticipantClientName
+    FROM   dbo.MeetingPayments pay
+    LEFT JOIN dbo.MeetingParticipants mp ON mp.ParticipantId = pay.ParticipantId
+    LEFT JOIN dbo.Users               u  ON u.UserId         = mp.UserId
+    LEFT JOIN dbo.Clients             c  ON c.ClientId       = mp.ClientId
+    WHERE  pay.MeetingId = @MeetingId
+    ORDER  BY pay.RecordedAt DESC;
 END

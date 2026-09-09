@@ -41,4 +41,12 @@ BEGIN
            MaxParticipantsDefault   = @MaxParticipantsDefault,
            UpdatedOn                = sysutcdatetime()
     WHERE  SettingsId = 1;
+
+    -- Return the updated row (caller uses QuerySingleAsync)
+    SELECT SettingsId, AdminAccess, ManagerAccess, UserCanCreate,
+           AllowClientParticipants, AllowPaidMeetings, DefaultFeePerParticipant,
+           RequireApproval, NotifyOnCreate, NotifyOnUpdate, NotifyOnCancel,
+           MaxParticipantsDefault, UpdatedOn
+    FROM   dbo.MeetingSettings
+    WHERE  SettingsId = 1;
 END

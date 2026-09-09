@@ -12,7 +12,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Meeting row
+    -- Single result set (participants fetched separately via usp_Meeting_GetParticipants)
     SELECT m.MeetingId, m.Title, m.Description, m.StartUtc, m.EndUtc,
            m.Location, m.MeetingType, m.Status, m.IsPaid, m.FeePerParticipant,
            m.CreatedByUserId, m.CreatedByName, m.MaxParticipants,
@@ -21,13 +21,4 @@ BEGIN
             WHERE mp.MeetingId = m.MeetingId) AS ParticipantCount
     FROM   dbo.Meetings m
     WHERE  m.MeetingId = @MeetingId;
-
-    -- Participants
-    SELECT ParticipantId, MeetingId, UserId, ClientId, ParticipantName,
-           ParticipantEmail, RoleName, ParticipantRole, Status,
-           IsPaid, PaymentAmount, PaymentDate, PaymentMethod,
-           InvitedAt, RespondedAt
-    FROM   dbo.MeetingParticipants
-    WHERE  MeetingId = @MeetingId
-    ORDER  BY InvitedAt ASC;
 END
