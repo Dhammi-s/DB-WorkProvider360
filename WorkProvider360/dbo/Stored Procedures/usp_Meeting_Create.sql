@@ -14,7 +14,7 @@ CREATE PROCEDURE dbo.usp_Meeting_Create
     @Location          NVARCHAR (300),
     @MeetingType       NVARCHAR (20),
     @IsPaid            BIT,
-    @FeePerParticipant DECIMAL (10, 2),
+    @FeePerParticipant DECIMAL (10, 2) = 0,
     @CreatedByUserId   INT,
     @CreatedByName     NVARCHAR (200) = NULL,   -- optional; resolved from Users if not supplied
     @MaxParticipants   INT,
@@ -34,7 +34,7 @@ BEGIN
             IsPaid, FeePerParticipant, CreatedByUserId, CreatedByName,
             MaxParticipants, Notes, ColorTag)
     VALUES (@Title, @Description, @StartUtc, @EndUtc, @Location, @MeetingType,
-            @IsPaid, @FeePerParticipant, @CreatedByUserId, @resolvedName,
+            @IsPaid, ISNULL(@FeePerParticipant, 0), @CreatedByUserId, @resolvedName,
             @MaxParticipants, @Notes, @ColorTag);
 
     SELECT SCOPE_IDENTITY() AS MeetingId;

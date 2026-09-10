@@ -15,7 +15,7 @@ CREATE PROCEDURE dbo.usp_Meeting_Update
     @Location          NVARCHAR (300),
     @MeetingType       NVARCHAR (20),
     @IsPaid            BIT,
-    @FeePerParticipant DECIMAL (10, 2),
+    @FeePerParticipant DECIMAL (10, 2) = 0,
     @MaxParticipants   INT,
     @Notes             NVARCHAR (MAX),
     @ColorTag          NVARCHAR (20)
@@ -31,7 +31,7 @@ BEGIN
            Location          = @Location,
            MeetingType       = @MeetingType,
            IsPaid            = @IsPaid,
-           FeePerParticipant = @FeePerParticipant,
+           FeePerParticipant = ISNULL(@FeePerParticipant, 0),
            MaxParticipants   = @MaxParticipants,
            Notes             = @Notes,
            ColorTag          = @ColorTag,
