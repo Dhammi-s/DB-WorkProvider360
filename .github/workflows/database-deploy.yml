@@ -8,42 +8,214 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v4
 
-      - uses: microsoft/setup-msbuild@v2
+      # ==========================================
+      # CHECKOUT
+      # ==========================================
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
+      # ==========================================
+      # SETUP MSBUILD
+      # ==========================================
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      # ==========================================
+      # BUILD SQL PROJECT
+      # ==========================================
       - name: Build SQL Project
         shell: powershell
         run: |
           msbuild WorkProvider360\WorkProvider360.sqlproj /p:Configuration=Release
 
+      # ==========================================
+      # INSTALL SQLPACKAGE
+      # ==========================================
       - name: Install SqlPackage
         shell: powershell
         run: |
           dotnet tool install --global microsoft.sqlpackage
 
+      # ==========================================
+      # ADD SQLPACKAGE TO PATH
+      # ==========================================
       - name: Add SqlPackage To PATH
         shell: powershell
         run: |
-          "$env:USERPROFILE\.dotnet\tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          "$env:USERPROFILE\.dotnet\tools" |
+            Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
+      # ==========================================
+      # VERIFY SQLPACKAGE
+      # ==========================================
       - name: Verify SqlPackage
         shell: powershell
         run: |
           sqlpackage /Version
 
+      # ==========================================
+      # GENERATE SQL SCRIPTS
+      # ==========================================
       - name: Generate SQL Scripts
         shell: powershell
         run: |
           .\Scripts\Deploy-AllTenants.ps1 -GenerateScript
 
+      # ==========================================
+      # UPLOAD SQL SCRIPTS
+      # ==========================================
       - name: Upload SQL Scripts
         uses: actions/upload-artifact@v4
         with:
           name: SQL-Deployment-Scripts
           path: Scripts\Output\*.sql
 
+      # ==========================================
+      # DEPLOY DATABASE
+      # ==========================================
       - name: Deploy
         shell: powershell
         run: |
           .\Scripts\Deploy-AllTenants.ps1
+
+      # ==========================================
+      # SUCCESS EMAIL
+      # ==========================================
+      - name: Send Success Email
+        if: success()
+        shell: powershell
+        env:
+          BREVO_SMTP_HOST: ${{ secrets.BREVO_SMTP_HOST }}
+          BREVO_SMTP_PORT: ${{ secrets.BREVO_SMTP_PORT }}
+          BREVO_SMTP_USER: ${{ secrets.BREVO_SMTP_USER }}
+          BREVO_SMTP_PASSWORD: ${{ secrets.BREVO_SMTP_PASSWORD }}
+          BREVO_FROM_EMAIL: ${{ secrets.BREVO_FROM_EMAIL }}
+          BREVO_TO_EMAILS: ${{ secrets.BREVO_TO_EMAILS }}
+        run: |
+
+          $branch = "${{ github.ref_name }}"
+          $repository = "${{ github.repository }}"
+          $commit = "${{ github.sha }}"
+          $actor = "${{ github.actor }}"
+          $runUrl = "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          $subject = "✅ SQL Database Deployment Successful - $branch"
+
+          $body = @"
+          SQL Database Deployment Successful
+
+          Repository:
+          $repository
+
+          Branch:
+          $branch
+
+          Commit:
+          $commit
+
+          Triggered By:
+          $actor
+
+          Status:
+          SUCCESS
+
+          GitHub Actions Run:
+          $runUrl
+
+          The SQL database deployment completed successfully.
+
+          Regards,
+          GitHub Actions
+          "@
+
+          $securePassword = ConvertTo-SecureString `
+            $env:BREVO_SMTP_PASSWORD `
+            -AsPlainText `
+            -Force
+
+          $credential = New-Object System.Management.Automation.PSCredential(
+            $env:BREVO_SMTP_USER,
+            $securePassword
+          )
+
+          Send-MailMessage `
+            -SmtpServer $env:BREVO_SMTP_HOST `
+            -Port ([int]$env:BREVO_SMTP_PORT) `
+            -UseSsl `
+            -Credential $credential `
+            -From $env:BREVO_FROM_EMAIL `
+            -To ($env:BREVO_TO_EMAILS -split ",") `
+            -Subject $subject `
+            -Body $body
+
+
+      # ==========================================
+      # FAILURE EMAIL
+      # ==========================================
+      - name: Send Failure Email
+        if: failure()
+        shell: powershell
+        env:
+          BREVO_SMTP_HOST: ${{ secrets.BREVO_SMTP_HOST }}
+          BREVO_SMTP_PORT: ${{ secrets.BREVO_SMTP_PORT }}
+          BREVO_SMTP_USER: ${{ secrets.BREVO_SMTP_USER }}
+          BREVO_SMTP_PASSWORD: ${{ secrets.BREVO_SMTP_PASSWORD }}
+          BREVO_FROM_EMAIL: ${{ secrets.BREVO_FROM_EMAIL }}
+          BREVO_TO_EMAILS: ${{ secrets.BREVO_TO_EMAILS }}
+        run: |
+
+          $branch = "${{ github.ref_name }}"
+          $repository = "${{ github.repository }}"
+          $commit = "${{ github.sha }}"
+          $actor = "${{ github.actor }}"
+          $runUrl = "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          $subject = "❌ SQL Database Deployment FAILED - $branch"
+
+          $body = @"
+          SQL Database Deployment Failed
+
+          Repository:
+          $repository
+
+          Branch:
+          $branch
+
+          Commit:
+          $commit
+
+          Triggered By:
+          $actor
+
+          Status:
+          FAILED
+
+          GitHub Actions Run:
+          $runUrl
+
+          Please open the GitHub Actions run to check the failed step and error logs.
+
+          Regards,
+          GitHub Actions
+          "@
+
+          $securePassword = ConvertTo-SecureString `
+            $env:BREVO_SMTP_PASSWORD `
+            -AsPlainText `
+            -Force
+
+          $credential = New-Object System.Management.Automation.PSCredential(
+            $env:BREVO_SMTP_USER,
+            $securePassword
+          )
+
+          Send-MailMessage `
+            -SmtpServer $env:BREVO_SMTP_HOST `
+            -Port ([int]$env:BREVO_SMTP_PORT) `
+            -UseSsl `
+            -Credential $credential `
+            -From $env:BREVO_FROM_EMAIL `
+            -To ($env:BREVO_TO_EMAILS -split ",") `
+            -Subject $subject `
+            -Body $body
